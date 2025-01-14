@@ -34,6 +34,10 @@ net start winnat
 ## Link library to the project
 
 ```sh
+dotnet new console --name RabbitMqProducer
+dotnet new console --name RabbitMqConsumer
+
+# cd and add nuget package to each directory
 dotnet add package RabbitMQ.Client
 ```
 
