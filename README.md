@@ -42,3 +42,19 @@ dotnet add package RabbitMQ.Client
 ```
 
 ---
+
+## Connect to container daemon
+
+```sh
+docker exec -it rabbitmq /bin/bash
+```
+
+Print message_unacknowledged and ready messages:
+
+```sh
+sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged
+# Or in container, just without sudo
+rabbitmqctl list_queues name messages_ready messages_unacknowledged
+```
+
+---

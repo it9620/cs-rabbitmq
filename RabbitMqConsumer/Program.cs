@@ -24,9 +24,13 @@ consumer.ReceivedAsync += async (model, ea) =>
     await Task.Delay(dots * 1000);
 
     Console.WriteLine(" [x] Done");
+
+    // Manual Acknowlwdgment:
+    // here channel could also be accessed as ((AsyncEventingBasicConsumer)sender).Channel
+    await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
 };
 
-await channel.BasicConsumeAsync(queue: "hello", autoAck: true, consumer: consumer);
+await channel.BasicConsumeAsync(queue: "hello", autoAck: false, consumer: consumer);
 
 Console.WriteLine(" Press [enter] to exit.");
 Console.ReadLine();
