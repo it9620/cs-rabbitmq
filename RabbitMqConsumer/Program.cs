@@ -16,8 +16,10 @@ QueueDeclareOk queueDeclareResult = await channel.QueueDeclareAsync();
 string queueName = queueDeclareResult.QueueName;
 
 // Binding queue to exchange:
-await channel.QueueBindAsync(
-    queue: queueName, exchange: exchangeName, routingKey: "black");
+foreach (string? severity in args)
+{
+    await channel.QueueBindAsync(queue: queueName, exchange: "direct_logs", routingKey: severity);
+}
 
 Console.WriteLine(" [*] Waiting for messages.");
 
@@ -27,7 +29,9 @@ consumer.ReceivedAsync += async (model, ea) =>
 {
     var body = ea.Body.ToArray();
     var message = Encoding.UTF8.GetString(body);
-    Console.WriteLine($" [x] Received {message}");
+
+    var routingKey = ea.RoutingKey;
+    Console.WriteLine($" [x] Received '{routingKey}':'{message}'");
 
     int dots = message.Split('.').Length - 1;
     await Task.Delay(dots * 1000);
