@@ -1,6 +1,6 @@
 # RabbitMQ Producer
 
-https://www.rabbitmq.com/tutorials/tutorial-one-dotnet
+[The source](https://www.rabbitmq.com/tutorials/tutorial-one-dotnet)
 
 ## Commands install and run
 
@@ -55,6 +55,12 @@ Print message_unacknowledged and ready messages:
 sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged
 # Or in container, just without sudo
 rabbitmqctl list_queues name messages_ready messages_unacknowledged
+```
+
+Print exchanges
+
+```sh
+rabbitmqctl list_exchanges
 ```
 
 ---

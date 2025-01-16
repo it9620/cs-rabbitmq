@@ -2,14 +2,28 @@
 using RabbitMQ.Client.Events;
 using System.Text;
 
+//const string queueName = "logs";
+const string exchangeName = "logs";
+
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-await channel.QueueDeclareAsync(queue: "task_queue", durable: true, exclusive: false,
-    autoDelete: false, arguments: null);
 
-await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
+// await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false,
+//    autoDelete: false, arguments: null);
+// await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
+
+// Declare temporary queue:
+QueueDeclareOk queueDeclareResult = await channel.QueueDeclareAsync();
+string queueName = queueDeclareResult.QueueName;
+
+// Binding queue to exchange:
+await channel.QueueBindAsync(
+    queue: queueName, exchange: exchangeName, routingKey: string.Empty);
+
+
+
 
 Console.WriteLine(" [*] Waiting for messages.");
 
@@ -26,13 +40,9 @@ consumer.ReceivedAsync += async (model, ea) =>
     await Task.Delay(dots * 1000);
 
     Console.WriteLine(" [x] Done");
-
-    // Manual Acknowlwdgment:
-    // here channel could also be accessed as ((AsyncEventingBasicConsumer)sender).Channel
-    await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
 };
 
-await channel.BasicConsumeAsync(queue: "task_queue", autoAck: false, consumer: consumer);
+await channel.BasicConsumeAsync(queue: queueName, autoAck: true, consumer: consumer);
 
 Console.WriteLine(" Press [enter] to exit.");
 Console.ReadLine();

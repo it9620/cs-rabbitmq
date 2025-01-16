@@ -1,25 +1,19 @@
 ﻿using RabbitMQ.Client;
 using System.Text;
 
+const string exchangeName = "logs";
+
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-await channel.QueueDeclareAsync(
-    queue: "task_queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Fanout);
 
 var message = GetMessage(args);
 var body = Encoding.UTF8.GetBytes(message);
-
-var properties = new BasicProperties
-{
-    Persistent = true
-};
-
 await channel.BasicPublishAsync(
-    exchange: string.Empty, routingKey: "task_queue", mandatory: true,
-    basicProperties: properties, body: body);
-
+    exchange: exchangeName, routingKey: string.Empty, body: body);
+    
 Console.WriteLine($" [x] Sent {message}");
 
 Console.WriteLine(" Press [enter] to exit.");
