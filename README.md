@@ -63,4 +63,10 @@ Print exchanges
 rabbitmqctl list_exchanges
 ```
 
+List bindings
+
+```sh
+rabbitmqctl list_bindings
+```
+
 ---

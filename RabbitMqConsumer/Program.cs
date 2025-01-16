@@ -9,7 +9,9 @@ var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
+await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Fanout);
 
+// Declare exchange by Work model:
 // await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false,
 //    autoDelete: false, arguments: null);
 // await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
@@ -22,12 +24,8 @@ string queueName = queueDeclareResult.QueueName;
 await channel.QueueBindAsync(
     queue: queueName, exchange: exchangeName, routingKey: string.Empty);
 
-
-
-
 Console.WriteLine(" [*] Waiting for messages.");
 
-// 'EventingBasicConsumer' is part of newer RabbitMQ.Client versions
 var consumer = new AsyncEventingBasicConsumer(channel);
 
 consumer.ReceivedAsync += async (model, ea) =>
