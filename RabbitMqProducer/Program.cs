@@ -1,19 +1,19 @@
 ﻿using RabbitMQ.Client;
 using System.Text;
 
-const string exchangeName = "logs";
+const string exchangeName = "direct_logs";
 
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Fanout);
+await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Direct);
 
 var message = GetMessage(args);
 var body = Encoding.UTF8.GetBytes(message);
 await channel.BasicPublishAsync(
-    exchange: exchangeName, routingKey: string.Empty, body: body);
-    
+    exchange: exchangeName, routingKey: "black", body: body);
+
 Console.WriteLine($" [x] Sent {message}");
 
 Console.WriteLine(" Press [enter] to exit.");

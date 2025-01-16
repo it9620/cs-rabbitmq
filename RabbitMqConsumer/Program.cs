@@ -3,18 +3,13 @@ using RabbitMQ.Client.Events;
 using System.Text;
 
 //const string queueName = "logs";
-const string exchangeName = "logs";
+const string exchangeName = "direct_logs";
 
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Fanout);
-
-// Declare exchange by Work model:
-// await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false,
-//    autoDelete: false, arguments: null);
-// await channel.BasicQosAsync(prefetchSize: 0, prefetchCount: 1, global: false);
+await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Direct);
 
 // Declare temporary queue:
 QueueDeclareOk queueDeclareResult = await channel.QueueDeclareAsync();
@@ -22,7 +17,7 @@ string queueName = queueDeclareResult.QueueName;
 
 // Binding queue to exchange:
 await channel.QueueBindAsync(
-    queue: queueName, exchange: exchangeName, routingKey: string.Empty);
+    queue: queueName, exchange: exchangeName, routingKey: "black");
 
 Console.WriteLine(" [*] Waiting for messages.");
 
