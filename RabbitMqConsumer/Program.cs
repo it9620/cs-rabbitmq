@@ -2,26 +2,35 @@
 using RabbitMQ.Client.Events;
 using System.Text;
 
-//const string queueName = "logs";
-const string exchangeName = "direct_logs";
+if (args.Length < 1)
+{
+    Console.Error.WriteLine("Usage: {0} [binding_key...]",
+                            Environment.GetCommandLineArgs()[0]);
+    Console.WriteLine(" Press [enter] to exit.");
+    Console.ReadLine();
+    Environment.ExitCode = 1;
+    return;
+}
+
+const string exchangeName = "topic_logs";
 
 var factory = new ConnectionFactory { HostName = "localhost" };
 using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
-await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Direct);
+await channel.ExchangeDeclareAsync(exchange: exchangeName, type: ExchangeType.Topic);
 
 // Declare temporary queue:
 QueueDeclareOk queueDeclareResult = await channel.QueueDeclareAsync();
 string queueName = queueDeclareResult.QueueName;
 
 // Binding queue to exchange:
-foreach (string? severity in args)
+foreach (string? bindingKey in args)
 {
-    await channel.QueueBindAsync(queue: queueName, exchange: "direct_logs", routingKey: severity);
+    await channel.QueueBindAsync(queue: queueName, exchange: "topic_logs", routingKey: bindingKey);
 }
 
-Console.WriteLine(" [*] Waiting for messages.");
+Console.WriteLine(" [*] Waiting for messages. To exit press CTRL+C");
 
 var consumer = new AsyncEventingBasicConsumer(channel);
 
