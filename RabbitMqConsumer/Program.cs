@@ -7,7 +7,7 @@ using var connection = await factory.CreateConnectionAsync();
 using var channel = await connection.CreateChannelAsync();
 
 await channel.QueueDeclareAsync(
-    queue: "hello", durable: false, exclusive: false, autoDelete: false, arguments: null);
+    queue: "task_queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
 
 Console.WriteLine(" [*] Waiting for messages.");
 
@@ -30,7 +30,7 @@ consumer.ReceivedAsync += async (model, ea) =>
     await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
 };
 
-await channel.BasicConsumeAsync(queue: "hello", autoAck: false, consumer: consumer);
+await channel.BasicConsumeAsync(queue: "task_queue", autoAck: false, consumer: consumer);
 
 Console.WriteLine(" Press [enter] to exit.");
 Console.ReadLine();
