@@ -9,7 +9,6 @@ await channel.QueueDeclareAsync(
     queue: "task_queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
 
 var message = GetMessage(args);
-
 var body = Encoding.UTF8.GetBytes(message);
 
 var properties = new BasicProperties
